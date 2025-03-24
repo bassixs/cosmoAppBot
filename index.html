@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmoTap</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #cosmo-button {
+            width: 200px;
+            height: 200px;
+            background: url('https://via.placeholder.com/200') no-repeat center;
+            border: none;
+            cursor: pointer;
+        }
+        #score {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Космо-очки: 0</div>
+    <button id="cosmo-button"></button>
+
+    <script>
+        const scoreDisplay = document.getElementById('score');
+        const cosmoButton = document.getElementById('cosmo-button');
+        let score = 0;
+
+        // Инициализация Telegram Web App
+        window.Telegram.WebApp.ready();
+
+        // Получаем ID пользователя из Telegram
+        const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+
+        // Функция отправки тапа на сервер
+        async function sendTap() {
+            const response = await fetch('http://localhost:5000/tap', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                score += 1;
+                scoreDisplay.textContent = `Космо-очки: ${score}`;
+            }
+        }
+
+        // Обработчик клика
+        cosmoButton.addEventListener('click', sendTap);
+    </script>
+</body>
+</html>
